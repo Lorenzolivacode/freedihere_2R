@@ -1,6 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { gql } from "@apollo/client";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
+
+const GET_BRANDS = gql`
+  query GetBrands {
+    getBrands {
+      id
+      name_brand
+    }
+  }
+`;
+
+const GET_SUBCATEGORIES = gql`
+  query GetSubcategories {
+    getSubcategories {
+      id
+      subcategory_name
+    }
+  }
+`;
 
 const CREATE_FOOD = gql`
   mutation CreateFood(
@@ -47,6 +65,16 @@ const CREATE_FOOD = gql`
 
 export default function CreateFoodForm() {
   const [createFood, { loading, error, data }] = useMutation(CREATE_FOOD);
+  const {
+    loading: brandsLoading,
+    error: brandsError,
+    data: brandsData,
+  } = useQuery(GET_BRANDS);
+  const {
+    loading: subcategoriesLoading,
+    error: subcategoriesError,
+    data: subcategoriesData,
+  } = useQuery(GET_SUBCATEGORIES);
 
   const [form, setForm] = useState({
     food: "",
@@ -93,17 +121,58 @@ export default function CreateFoodForm() {
         fiber: parseFloat(form.fiber),
         proteins: parseFloat(form.proteins),
         salt: parseFloat(form.salt),
-        unity_weights: form.unity_weights
-          .split(",")
-          .map((n) => parseFloat(n.trim())),
+        ...(form.unity_weights
+          ? {
+              unity_weights: form.unity_weights
+                .split(",")
+                .map((n) => parseFloat(n.trim())),
+            }
+          : { unity_weights: [] }),
       },
     });
+    setForm({
+      food: "",
+      food_note: "",
+      id_sub: "",
+      detail_product: "",
+      note: "",
+      id_brand: "",
+      join_shops: "",
+      kcal: "",
+      fat: "",
+      sat_fat: "",
+      carbo: "",
+      sugar: "",
+      fiber: "",
+      proteins: "",
+      salt: "",
+      unity_weights: "",
+    });
   };
+
+  useEffect(() => {
+    console.log(brandsData);
+  }, [brandsData]);
 
   const inputStyle =
     "w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500";
 
   const sectionTitle = "text-lg font-semibold text-gray-700 mt-6";
+
+  if (
+    brandsLoading ||
+    !brandsData ||
+    subcategoriesLoading ||
+    !subcategoriesData
+  ) {
+    return <p>Loading brands and subcategories...</p>;
+  }
+  if (brandsError) {
+    return <p>Error: {brandsError.message}</p>;
+  }
+  if (subcategoriesError) {
+    return <p>Error: {subcategoriesError.message}</p>;
+  }
 
   return (
     <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8">
@@ -116,6 +185,7 @@ export default function CreateFoodForm() {
             name="food"
             placeholder="Food name"
             onChange={handleChange}
+            value={form.food}
             required
             className={inputStyle}
           />
@@ -123,21 +193,68 @@ export default function CreateFoodForm() {
             name="food_note"
             placeholder="Food note"
             onChange={handleChange}
+            value={form.food_note}
             className={inputStyle}
           />
-          <input
+          {/* <input
             name="id_sub"
             placeholder="Subcategory ID"
             onChange={handleChange}
+            value={form.id_sub}
             required
             className={inputStyle}
-          />
-          <input
+          /> */}
+          {subcategoriesData && (
+            <select
+              name="id_sub"
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                handleChange(e as any)
+              }
+              value={form.id_sub}
+              className={inputStyle}
+            >
+              <option value="">Select a subcategory</option>
+              {(
+                subcategoriesData as {
+                  getSubcategories?: { id: string; subcategory_name: string }[];
+                }
+              )?.getSubcategories?.map(
+                (subcategory: { id: string; subcategory_name: string }) => (
+                  <option key={subcategory.id} value={subcategory.id}>
+                    {subcategory.subcategory_name}
+                  </option>
+                )
+              )}
+            </select>
+          )}
+          {/* <input
             name="id_brand"
             placeholder="Brand ID"
             onChange={handleChange}
+            value={form.id_brand}
             className={inputStyle}
-          />
+          /> */}
+          {brandsData && (
+            <select
+              name="id_brand"
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                handleChange(e as any)
+              }
+              value={form.id_brand}
+              className={inputStyle}
+            >
+              <option value="">Select a brand</option>
+              {(
+                brandsData as {
+                  getBrands?: { id: string; name_brand: string }[];
+                }
+              )?.getBrands?.map((brand: { id: string; name_brand: string }) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name_brand}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {/* DETAILS */}
@@ -147,18 +264,21 @@ export default function CreateFoodForm() {
             name="detail_product"
             placeholder="Product detail"
             onChange={handleChange}
+            value={form.detail_product}
             className={inputStyle}
           />
           <input
             name="note"
             placeholder="Detail note"
             onChange={handleChange}
+            value={form.note}
             className={inputStyle}
           />
           <input
             name="join_shops"
             placeholder="Shop IDs (comma separated)"
             onChange={handleChange}
+            value={form.join_shops}
             className={inputStyle}
           />
         </div>
@@ -170,6 +290,7 @@ export default function CreateFoodForm() {
             name="kcal"
             placeholder="Kcal"
             onChange={handleChange}
+            value={form.kcal}
             required
             className={inputStyle}
           />
@@ -177,6 +298,7 @@ export default function CreateFoodForm() {
             name="fat"
             placeholder="Fat"
             onChange={handleChange}
+            value={form.fat}
             required
             className={inputStyle}
           />
@@ -184,6 +306,7 @@ export default function CreateFoodForm() {
             name="sat_fat"
             placeholder="Sat Fat"
             onChange={handleChange}
+            value={form.sat_fat}
             required
             className={inputStyle}
           />
@@ -191,6 +314,7 @@ export default function CreateFoodForm() {
             name="carbo"
             placeholder="Carbs"
             onChange={handleChange}
+            value={form.carbo}
             required
             className={inputStyle}
           />
@@ -198,6 +322,7 @@ export default function CreateFoodForm() {
             name="sugar"
             placeholder="Sugar"
             onChange={handleChange}
+            value={form.sugar}
             required
             className={inputStyle}
           />
@@ -205,6 +330,7 @@ export default function CreateFoodForm() {
             name="fiber"
             placeholder="Fiber"
             onChange={handleChange}
+            value={form.fiber}
             required
             className={inputStyle}
           />
@@ -212,6 +338,7 @@ export default function CreateFoodForm() {
             name="proteins"
             placeholder="Proteins"
             onChange={handleChange}
+            value={form.proteins}
             required
             className={inputStyle}
           />
@@ -219,6 +346,7 @@ export default function CreateFoodForm() {
             name="salt"
             placeholder="Salt"
             onChange={handleChange}
+            value={form.salt}
             required
             className={inputStyle}
           />
@@ -231,14 +359,14 @@ export default function CreateFoodForm() {
           name="unity_weights"
           placeholder="e.g. 100, 250, 500"
           onChange={handleChange}
-          required
+          value={form.unity_weights}
           className={inputStyle}
         />
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50"
+          className="w-full mt-6 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50"
         >
           {loading ? "Creating..." : "Create Food"}
         </button>

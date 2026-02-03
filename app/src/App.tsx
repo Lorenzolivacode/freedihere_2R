@@ -1,6 +1,6 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import freedihere from "./../public/freedihare_logo.svg";
 import "./App.css";
 import CreateFoodForm from "./components/temp/foodForm";
 
@@ -9,16 +9,10 @@ function App() {
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="flex items-center gap-2 bg-sky-600 rounded-2xl p-2">
+        <img src={freedihere} className="w-16 h-16" alt="React logo" />
+        <h1 className="text-2xl font-bold">Freedihere</h1>
       </div>
-      <h1>Vite + React + Pippo</h1>
-      <h1 className="bg-red-500">Prova 3</h1>
       <CreateFoodForm></CreateFoodForm>
       {/* <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
