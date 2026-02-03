@@ -1,0 +1,75 @@
+## Architettura
+
+freedihare-2R-first-app/
+│
+│
+├─ **app/** ← frontend - React SPA (Vite)
+│ ├─ src/
+│ │ ├─ components/
+│ │ ├─ App.tsx
+│ │ └─ main.tsx
+│ ├─ dist/
+│ │
+│ ├─ eslint.config.js
+│ ├─ index.html
+│ ├─ package.json
+│ ├─ tsconfig.app.json
+│ ├─ tsconfig.json
+│ ├─ tsconfig.node.json
+│ └─ vite.config.json
+│
+├─ **backend/** ← Node + GraphQL
+│ ├─ generated/
+│ │ └─ prisma/
+│ │
+│ ├─ GraphQL/
+│ │ ├─ Models/
+│ │ │ ├─ ...model/
+│ │ │ │ ├─ index.ts
+│ │ │ │ ├─ model.mutations.ts
+│ │ │ │ ├─ model.objects.ts
+│ │ │ │ └─ model.queries.ts
+│ │ │ └─ index.ts
+│ │ │
+│ │ ├─ Builder.ts
+│ │ ├─ enum.ts
+│ │ └─ schema.ts
+│ │
+│ ├─ prisma/
+│ │ └─ schema.prisma
+│ │
+│ ├─ src/
+│ │ ├─ lib/
+│ │ │ └─ prisma.ts
+│ │ └─ index.ts
+│ │
+│ ├─ .env
+│ ├─ package.json
+│ ├─ prisma.config.ts
+│ └─ tsconfig.json
+│
+├─ **electron/**
+│ ├─ main.js
+│ └─ preload.js
+│
+├─ .env
+├─ electron-builder.md
+├─ package.json ← root (electron-builder)
+└─ tsconfig.json
+
+## Come comunicano
+
+Electron
+│
+├─ avvia backend Node
+│
+└─ carica React build
+│
+▼
+GraphQL (localhost interno)
+│
+▼
+Prisma
+│
+▼
+Supabase (Postgres)

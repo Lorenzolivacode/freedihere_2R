@@ -1,0 +1,11 @@
+import "./Brand/index.js";
+import "./Category/index.js";
+import "./Detail_specifics/index.js";
+import "./Details/index.js";
+import "./Foods/index.js";
+import "./Macro/index.js";
+import "./Pans/index.js";
+import "./Recipe/index.js";
+import "./Shop/index.js";
+import "./Subcategory/index.js";
+import "./User/index.js";

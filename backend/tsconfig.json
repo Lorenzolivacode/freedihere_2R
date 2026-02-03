@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "types": ["node"]
+  },
+  "include": ["src/**/*", "GraphQL/**/*"],
+  "exclude": ["node_modules"]
+}

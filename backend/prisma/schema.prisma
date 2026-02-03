@@ -1,0 +1,425 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js" // ✅ Obbligatorio
+  output   = "../generated/prisma"
+}
+
+generator pothos {
+  provider     = "prisma-pothos-types"
+  // ✅ Deve puntare ESATTAMENTE allo stesso output del client sopra
+  clientOutput = "../generated/prisma"
+  // ✅ Forza la creazione di un file fisico che puoi importare
+  output       = "../generated/pothos-types.ts"
+}
+
+/* 
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  //engineType = "client"//"binary"
+}
+
+generator pothos {
+  provider = "prisma-pothos-types"
+  // Opzionale: specifica dove salvare i tipi se non li trova automaticamente
+  // output = "./pothos-types.ts" 
+  clientOutput = "../generated/prisma/client"
+  // Forza Pothos a generare i tipi puntando al client custom
+}
+ */
+datasource db {
+  provider = "postgresql"
+}
+
+enum SEX {
+  M
+  F
+}
+
+model User {
+  id                String @id @unique @default(uuid())
+  name              String
+  surname           String
+  nickname          String?
+  email             String
+  password          String
+  sex               SEX
+  birthday          DateTime
+  height            Int
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  dataUser          DataUser[]
+  faseUser          FaseUser[]
+  pans              Pans[]
+  recipe            Recipe[]
+}
+
+model DataUser {
+  id                String @id @unique @default(uuid())
+  weight            Decimal @db.Decimal(10, 2) @default(0.0)
+  waistline         Decimal? @db.Decimal(10, 2) @default(0.0)  //Girovita
+  crew_neck         Decimal? @db.Decimal(10, 2) @default(0.0)  //Girocollo
+  chest             Decimal? @db.Decimal(10, 2) @default(0.0)  //Petto
+  arm               Decimal? @db.Decimal(10, 2) @default(0.0)  //Braccio
+  thigh             Decimal? @db.Decimal(10, 2) @default(0.0)  //Coscia
+  calf              Decimal? @db.Decimal(10, 2) @default(0.0)  //Polpaccio
+  fat_mass          Decimal? @db.Decimal(10, 2) @default(0.0)  //Massa grassa
+  BMI               Decimal? @db.Decimal(10, 2) @default(0.0)  //Body mass index
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+
+  id_user           String
+  user              User @relation(fields:[id_user], references:[id], onDelete: Cascade)
+  
+  @@unique([id_user, createdAt])
+
+  @@index([id_user])
+}
+
+model FaseUser {
+  id                String @id @unique @default(uuid())
+  fase_name         String
+  multiply_perc     Int @default(30)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+  
+  id_user           String
+  user              User @relation(fields:[id_user], references:[id], onDelete: Cascade)
+
+  fase_specifics    Fase_specifics[]
+
+  @@unique([id_user, fase_name])
+
+  @@index ([id_user])
+}
+
+model Fase_specifics {
+  id                String @id @unique @default(uuid())
+  deltaKcal_perc    Int
+  fat_perc          Int
+  sat_fat_perc      Int
+  carbo_perc        Int
+  sugar_perc        Int
+  fiber_perc        Int
+  proteins_perc     Int
+  salt_perc         Int
+
+  validFrom         DateTime @default(now())
+  validTo           DateTime?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+
+  id_fase           String
+  fase              FaseUser @relation(fields:[id_fase], references:[id], onDelete: Cascade)
+
+  diaryUser         DiaryUser[]
+
+  @@index ([id_fase])
+  @@index ([validFrom])
+  @@index ([validTo])
+}
+
+model DiaryUser {
+  id                String @id @unique @default(uuid())
+  aspected_kcal     Decimal @db.Decimal(10, 2) @default(0.0)
+  day               DateTime @default(now())
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  
+  id_fase_specific  String
+  fase_specific     Fase_specifics @relation(fields:[id_fase_specific], references:[id], onDelete: Cascade)
+  
+  meals             Meals[]
+
+  @@unique([day, id_fase_specific])
+
+  @@index([day])
+  @@index([id_fase_specific])
+}
+
+model Meals {
+  id                String @id @unique @default(uuid())
+  meal_name         String
+  mealSnapshot      Json
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime?
+
+  id_diary          String
+  diaryUser         DiaryUser @relation(fields:[id_diary], references:[id], onDelete: Cascade)
+
+  join_meal_food    join_meal_food[]
+
+  @@index([id_diary])
+}
+
+model join_meal_food {
+  id                String @id @unique @default(uuid())
+  weight            Decimal @db.Decimal(10, 2) @default(0.0)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+
+  id_meal           String
+  meals             Meals @relation(fields:[id_meal], references:[id], onDelete: Cascade)
+  id_detail         String?
+  detail            Details? @relation(fields:[id_detail], references:[id], onDelete: Cascade)
+  id_recipe         String?
+  recipe            Recipe?  @relation(fields: [id_recipe], references: [id], onDelete: Cascade)
+
+  @@unique([id_meal, id_detail])
+  @@unique([id_meal, id_recipe])
+
+  @@index([id_meal])
+  @@index([id_detail])
+  @@index([id_recipe])
+}
+
+model Pans {
+  id                String @id @unique @default(uuid())
+  pan_name          String
+  pan_weight        Decimal @db.Decimal(10, 2) @default(0.0)
+
+  createdAt         DateTime @default(now())
+
+  id_user           String
+  user              User? @relation(fields:[id_user], references:[id], onDelete: Cascade)
+
+  @@index([id_user])
+}
+
+model Category {
+  id                String @id @unique @default(uuid())
+  category_name     String
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  subcat            Subcategory[]
+
+  @@index([category_name])
+}
+
+model Subcategory {
+  id                String @id @unique @default(uuid())
+  id_cat            String
+  subcategory_name  String
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  cat               Category @relation(fields:[id_cat], references:[id], onDelete: Cascade)
+  food              Foods[]
+  join_recipe       join_subs_recipe[]
+
+  @@index([subcategory_name])
+}
+
+model Foods {
+  id                String @id @unique @default(uuid())
+  food              String
+  food_note         String? @db.VarChar(1000)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  id_sub            String? // TODO - gestire delete sub impostando come new sub la category
+  subcat            Subcategory? @relation(fields:[id_sub], references:[id], onDelete: SetNull)
+
+  dets              Details[]
+
+  @@unique([food, id_sub])
+
+  @@index([food])
+  @@index([id_sub])
+}
+  
+model Macro {
+  id                String @id @unique @default(uuid())
+  kcal              Decimal @db.Decimal(10, 2) @default(0.0)
+  fat               Decimal @db.Decimal(10, 2) @default(0.0)
+  sat_fat           Decimal @db.Decimal(10, 2) @default(0.0)
+  carbo             Decimal @db.Decimal(10, 2) @default(0.0)
+  sugar             Decimal @db.Decimal(10, 2) @default(0.0)
+  fiber             Decimal? @db.Decimal(10, 2)
+  proteins          Decimal @db.Decimal(10, 2) @default(0.0)
+  salt              Decimal? @db.Decimal(10, 2)
+  isFSApproximated  Boolean
+  //for recipe
+  conversion_perc   Decimal? @db.Decimal(10, 2)
+  total_weight      Decimal? @db.Decimal(10, 2) // peso totale di una recipe a crudo
+
+  createdAt         DateTime @default(now())
+
+  id_detail         String? @unique
+  detail            Details? @relation(fields:[id_detail], references:[id], onDelete: Cascade)
+  id_recipe         String?
+  recipe            Recipe?  @relation(fields: [id_recipe], references: [id], onDelete: Cascade)
+
+  @@index([id_detail])
+  @@index([id_recipe])
+}
+
+model Details {
+  id                String @id @unique @default(uuid())
+  detail_product    String?
+  // Per testi lunghi con limiti predefiniti
+  note              String? @db.VarChar(1000) 
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  macro             Macro?
+  
+  id_food           String
+  food              Foods @relation(fields:[id_food], references:[id], onDelete: Cascade)
+  id_brand          String?
+  brand             Brand? @relation(fields:[id_brand], references:[id], onDelete: Cascade)
+
+  join_meal_food    join_meal_food[]
+  
+  specifics         Detail_specifics[]
+  join_shops        join_detail_shop[]
+  join_recipe       join_detail_recipe[]
+
+  @@index([detail_product])
+  @@index([id_food])
+  @@index([id_brand])
+}
+
+model Detail_specifics {
+  id                String @id @unique @default(uuid())
+  unity_weight      Decimal? @db.Decimal(10, 2) @default(0.0)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  id_detail         String
+  detail            Details? @relation(fields:[id_detail], references:[id], onDelete: Cascade)
+}
+
+model Brand {
+  id                String @id @unique @default(uuid())
+  name_brand        String
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  join_shop         join_shop_brand[]
+  dets              Details[]
+}
+
+model Shop {
+  id                String @id @unique @default(uuid())
+  name_shop         String
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  join_brand        join_shop_brand[]
+  join_details      join_detail_shop[]
+}
+
+model join_shop_brand {
+  id                String @id @unique @default(uuid())
+
+  createdAt         DateTime @default(now())
+  
+  id_brand          String
+  brand             Brand @relation(fields:[id_brand], references:[id], onDelete: Cascade)
+  id_shop           String
+  shop              Shop @relation(fields:[id_shop], references:[id], onDelete: Cascade)
+}
+
+model join_detail_shop {
+  id                String @id @unique @default(uuid())
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  id_detail         String
+  detail            Details @relation(fields:[id_detail], references:[id], onDelete: Cascade)
+  id_shop           String
+  shop              Shop @relation(fields:[id_shop], references:[id], onDelete: Cascade)
+}
+
+model Recipe {
+  id                String @id @unique @default(uuid())
+  name_recipe       String
+  recipe_note       String? @db.VarChar(3000) 
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime? 
+  deletedAt         DateTime? 
+
+  recipe_princ      join_recipe_recipe[] @relation("recipePrincipal")
+  recipe_ingr       join_recipe_recipe[] @relation("recipeIngridient")
+  
+  id_user           String?
+  user              User? @relation(fields:[id_user], references:[id], onDelete: SetNull)
+
+  join_meal_food    join_meal_food[]
+
+  macros            Macro[]
+  join_subs         join_subs_recipe[]
+  join_details      join_detail_recipe[]
+}
+
+model join_subs_recipe {
+  id                String @id @unique @default(uuid())
+  
+  createdAt         DateTime @default(now())
+
+  id_recipe         String
+  recipe            Recipe @relation(fields:[id_recipe], references:[id], onDelete: Cascade)
+  id_sub            String
+  subs              Subcategory @relation(fields:[id_sub], references:[id], onDelete: Cascade)
+}
+
+model join_recipe_recipe {
+  id                String @id @unique @default(uuid())
+  amount_food_perc  Decimal? @db.Decimal(10, 2) @default(0.0)
+
+  createdAt         DateTime @default(now())
+  deletedAt         DateTime? 
+  
+  id_recipePrinc    String
+  recipe_princ      Recipe @relation("recipePrincipal", fields: [id_recipePrinc], references: [id], onDelete: Cascade)
+
+  id_recipeIngr     String
+  recipe_ingr       Recipe @relation("recipeIngridient", fields: [id_recipeIngr], references: [id], onDelete: Cascade)
+}
+
+model join_detail_recipe {
+  id                String @id @unique @default(uuid())
+  amount_food_perc  Decimal? @db.Decimal(10, 2) @default(0.0)
+  
+  createdAt         DateTime @default(now())
+  deletedAt         DateTime? 
+
+  id_recipe         String
+  recipe            Recipe @relation(fields:[id_recipe], references:[id], onDelete: Cascade)
+  id_detail         String
+  detail            Details @relation(fields:[id_detail], references:[id], onDelete: Cascade)
+}

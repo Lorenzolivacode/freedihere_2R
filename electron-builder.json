@@ -1,0 +1,19 @@
+{
+  "productName": "Freedihare",
+  "directories": {
+    "output": "dist_electron",
+    "buildResources": "build"
+  },
+  "files": [
+    "electron/**/*",
+    "app/dist/**/*",
+    "backend/**/*",
+    "node_modules/**/*"
+  ],
+  "extraResources": [
+    { "from": "backend/generated/prisma", "to": "prisma" },
+    ".env"
+  ],
+  "win": { "target": "portable" },
+  "asar": true
+}
