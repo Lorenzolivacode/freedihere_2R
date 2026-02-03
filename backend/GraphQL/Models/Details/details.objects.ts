@@ -20,6 +20,7 @@ export const Details = Builder.prismaObject("Details", {
     id_brand: t.exposeString("id_brand"),
     brand: t.relation("brand", { nullable: true }),
     specifics: t.relation("specifics"),
+    user: t.relation("user", { nullable: true }),
     join_shops: t.relation("join_shops"),
     join_recipe: t.relation("join_recipe"),
     join_meal_food: t.relation("join_meal_food"),

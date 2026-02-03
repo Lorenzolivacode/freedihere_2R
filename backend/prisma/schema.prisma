@@ -59,6 +59,7 @@ model User {
   dataUser          DataUser[]
   faseUser          FaseUser[]
   pans              Pans[]
+  details           Details[]
   recipe            Recipe[]
 }
 
@@ -292,6 +293,10 @@ model Details {
   food              Foods @relation(fields:[id_food], references:[id], onDelete: Cascade)
   id_brand          String?
   brand             Brand? @relation(fields:[id_brand], references:[id], onDelete: Cascade)
+
+
+  id_user           String?
+  user              User? @relation(fields:[id_user], references:[id], onDelete: SetNull)
 
   join_meal_food    join_meal_food[]
   
