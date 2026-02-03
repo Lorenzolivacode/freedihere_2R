@@ -1,6 +1,7 @@
 import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import type PrismaTypes from "../generated/pothos-types.js";
+import { getDatamodel } from "../generated/pothos-types.js";
 //import type PrismaTypes from "@pothos/plugin-prisma/generated";
 import { prisma, Prisma } from "../src/lib/prisma.js";
 import { GraphQLError, GraphQLScalarType, Kind } from "graphql";
@@ -31,9 +32,8 @@ export const Builder = new SchemaBuilder<{
 }>({
   plugins: [PrismaPlugin],
   prisma: {
-    client: prisma,
-    dmmf: (prisma as any)._dmmf,
-    //dmmf: (GeneratedClient as any).Prisma.dmmf ?? ({} as any), //dmmf: prisma.dmmf,
+    client: () => prisma,
+    dmmf: getDatamodel(),
   },
 });
 
@@ -66,8 +66,9 @@ Builder.scalarType("Decimal", {
 Builder.addScalarType("DateTime", DateTimeResolver);
 Builder.addScalarType("JSON", JSONResolver, {});
 
-/* Builder.queryType({});
-Builder.mutationType({}); */
+// Inizializziamo i tipi base prima di registrare i models
+Builder.queryType({});
+Builder.mutationType({});
 
 // Creiamo lo Scalar manualmente senza librerie esterne
 /* const DecimalScalar = new GraphQLScalarType({
