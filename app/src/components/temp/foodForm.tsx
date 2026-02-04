@@ -20,6 +20,15 @@ const GET_SUBCATEGORIES = gql`
   }
 `;
 
+const GET_SHOPS = gql`
+  query GetShops {
+    getShops {
+      id
+      name_shop
+    }
+  }
+`;
+
 const CREATE_FOOD = gql`
   mutation CreateFood(
     $food: String!
@@ -75,6 +84,11 @@ export default function CreateFoodForm() {
     error: subcategoriesError,
     data: subcategoriesData,
   } = useQuery(GET_SUBCATEGORIES);
+  const {
+    loading: shopsLoading,
+    error: shopsError,
+    data: shopsData,
+  } = useQuery(GET_SHOPS);
 
   const [form, setForm] = useState({
     food: "",
@@ -96,6 +110,7 @@ export default function CreateFoodForm() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("handleChange", e.target.name, e.target.value);
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -151,8 +166,8 @@ export default function CreateFoodForm() {
   };
 
   useEffect(() => {
-    console.log(brandsData);
-  }, [brandsData]);
+    console.log("Errore POST: ", error);
+  }, [error]);
 
   const inputStyle =
     "w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500";
@@ -163,15 +178,20 @@ export default function CreateFoodForm() {
     brandsLoading ||
     !brandsData ||
     subcategoriesLoading ||
-    !subcategoriesData
+    !subcategoriesData ||
+    shopsLoading ||
+    !shopsData
   ) {
-    return <p>Loading brands and subcategories...</p>;
+    return <p>Loading brands, subcategories and shops...</p>;
   }
   if (brandsError) {
     return <p>Error: {brandsError.message}</p>;
   }
   if (subcategoriesError) {
     return <p>Error: {subcategoriesError.message}</p>;
+  }
+  if (shopsError) {
+    return <p>Error: {shopsError.message}</p>;
   }
 
   return (
@@ -274,13 +294,34 @@ export default function CreateFoodForm() {
             value={form.note}
             className={inputStyle}
           />
-          <input
-            name="join_shops"
-            placeholder="Shop IDs (comma separated)"
-            onChange={handleChange}
-            value={form.join_shops}
-            className={inputStyle}
-          />
+          {/*<input
+              name="join_shops"
+              placeholder="Shop IDs (comma separated)"
+              onChange={handleChange}
+              value={form.join_shops}
+              className={inputStyle}
+              /> */}
+          {shopsData && (
+            <select
+              name="join_shops"
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                handleChange(e as any)
+              }
+              value={form.join_shops}
+              className={inputStyle}
+            >
+              <option value="">Select a shop</option>
+              {(
+                shopsData as {
+                  getShops?: { id: string; name_shop: string }[];
+                }
+              )?.getShops?.map((shop: { id: string; name_shop: string }) => (
+                <option key={shop.id} value={shop.id}>
+                  {shop.name_shop}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {/* MACROS */}
