@@ -1,79 +1,13 @@
 import { useEffect, useState } from "react";
-import { gql } from "@apollo/client";
-import { useMutation, useQuery } from "@apollo/client/react";
-
-const GET_BRANDS = gql`
-  query GetBrands {
-    getBrands {
-      id
-      name_brand
-    }
-  }
-`;
-
-const GET_SUBCATEGORIES = gql`
-  query GetSubcategories {
-    getSubcategories {
-      id
-      subcategory_name
-    }
-  }
-`;
-
-const GET_SHOPS = gql`
-  query GetShops {
-    getShops {
-      id
-      name_shop
-    }
-  }
-`;
-
-const CREATE_FOOD = gql`
-  mutation CreateFood(
-    $food: String!
-    $food_note: String
-    $id_sub: String!
-    $detail_product: String
-    $note: String
-    $id_brand: String
-    $join_shops: [String!]
-    $kcal: Decimal!
-    $fat: Decimal!
-    $sat_fat: Decimal!
-    $carbo: Decimal!
-    $sugar: Decimal!
-    $fiber: Decimal!
-    $proteins: Decimal!
-    $salt: Decimal!
-    $unity_weights: [Decimal!]!
-  ) {
-    createFood(
-      food: $food
-      food_note: $food_note
-      id_sub: $id_sub
-      detail_product: $detail_product
-      note: $note
-      id_brand: $id_brand
-      join_shops: $join_shops
-      kcal: $kcal
-      fat: $fat
-      sat_fat: $sat_fat
-      carbo: $carbo
-      sugar: $sugar
-      fiber: $fiber
-      proteins: $proteins
-      salt: $salt
-      unity_weights: $unity_weights
-    ) {
-      id
-      food
-    }
-  }
-`;
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
+import { GET_BRANDS, GET_SHOPS } from "../../gql_crud/brands_shop/queries.js";
+import { GET_SUBCATEGORIES } from "../../gql_crud/cats_subs/queries.js";
+import { CREATE_FOOD_DETS } from "../../gql_crud/foods_dets/mutations.js";
+import { GET_FOODS_BY_INPUT } from "../../gql_crud/foods_dets/queries.js";
 
 export default function CreateFoodForm() {
-  const [createFood, { loading, error, data }] = useMutation(CREATE_FOOD);
+  const [createFood, { loading, error }] = useMutation(CREATE_FOOD_DETS);
+
   const {
     loading: brandsLoading,
     error: brandsError,
@@ -108,6 +42,34 @@ export default function CreateFoodForm() {
     salt: "",
     unity_weights: "",
   });
+  const [selectedFood, setSelectedFood] = useState("");
+
+  const [searchFood, setSearchFood] = useState("");
+
+  /*   const {
+    loading: foodsByInputLoading,
+    error: foodsByInputError,
+    data: foodsByInputData,
+  } = useQuery(GET_FOODS_BY_INPUT, {
+    variables: { input: searchFood },
+    skip: !searchFood,
+  }); */
+  const [
+    getFoods,
+    {
+      loading: _foodsByInputLoading,
+      error: _foodsByInputError,
+      data: foodsByInputData,
+    },
+  ] = useLazyQuery(GET_FOODS_BY_INPUT);
+
+  const handleSearch = () => {
+    if (searchFood) {
+      getFoods({
+        variables: { input: searchFood },
+      });
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log("handleChange", e.target.name, e.target.value);
@@ -168,9 +130,41 @@ export default function CreateFoodForm() {
   useEffect(() => {
     console.log("Errore POST: ", error);
   }, [error]);
+  useEffect(() => {
+    if (!!selectedFood && foodsByInputData) {
+      const foodsList = (
+        foodsByInputData as {
+          getFoodsByInput: {
+            id: string;
+            food: string;
+            food_note: string;
+            subcategory: { id: string; subcategory_name: string };
+          }[];
+        }
+      ).getFoodsByInput;
+
+      const food = foodsList.find(
+        (f: {
+          id: string;
+          food: string;
+          food_note: string;
+          subcategory: { id: string; subcategory_name: string };
+        }) => f.id === selectedFood
+      );
+
+      if (food) {
+        setForm((prev) => ({
+          ...prev,
+          food: food.food,
+          id_sub: food.subcategory.id,
+          food_note: food.food_note,
+        }));
+      }
+    }
+  }, [selectedFood]);
 
   const inputStyle =
-    "w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500";
+    "w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500";
 
   const sectionTitle = "text-lg font-semibold text-gray-700 mt-6";
 
@@ -201,6 +195,44 @@ export default function CreateFoodForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* BASIC */}
         <div className="grid md:grid-cols-2 gap-4">
+          <div className="flex items-center justify-center gap-2">
+            <input
+              name="searchFood"
+              placeholder="Search by food name"
+              onChange={(e) => setSearchFood(e.target.value)}
+              value={searchFood}
+              required
+              className={inputStyle}
+            />
+            <button
+              className="rounded-xl bg-sky-600 text-white shrink"
+              onClick={handleSearch}
+            >
+              Cerca
+            </button>
+          </div>
+          <select
+            name="food"
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              setSelectedFood(e.target.value);
+            }}
+            value={selectedFood}
+            className={`text-sky-600 ${inputStyle}`}
+          >
+            <option value="">Select a food</option>
+            {(
+              foodsByInputData as {
+                getFoodsByInput?: { id: string; food: string }[];
+              }
+            )?.getFoodsByInput?.map(
+              (subcategory: { id: string; food: string }) => (
+                <option key={subcategory.id} value={subcategory.id}>
+                  {subcategory.food}
+                </option>
+              )
+            )}
+          </select>
+
           <input
             name="food"
             placeholder="Food name"

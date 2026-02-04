@@ -75,6 +75,8 @@ Builder.mutationField("createFood", (t) =>
       });
 
       if (existingFood) {
+        console.log("siamo qui in createFood existingFood");
+
         await prisma.details.create({
           data: {
             id_food: existingFood.id,
@@ -85,6 +87,44 @@ Builder.mutationField("createFood", (t) =>
         // restituisci l'oggetto food esistente, non il detail
         return existingFood;
       } else {
+        console.log(
+          "siamo qui in createFood",
+          "\n food: ",
+          args.food,
+          "\n food_note: ",
+          args.food_note,
+          "\n id_sub: ",
+          args.id_sub,
+          "\n dets: ",
+          dets,
+          "\n detail_product: ",
+          args.detail_product,
+          "\n note: ",
+          args.note,
+          "\n id_brand: ",
+          args.id_brand,
+          "\n join_shops: ",
+          args.join_shops,
+          "\n kcal: ",
+          args.kcal,
+          "\n fat: ",
+          args.fat,
+          "\n sat_fat: ",
+          args.sat_fat,
+          "\n carbo: ",
+          args.carbo,
+          "\n sugar: ",
+          args.sugar,
+          "\n fiber: ",
+          args.fiber,
+          "\n proteins: ",
+          args.proteins,
+          "\n salt: ",
+          args.salt,
+          "\n unity_weights: ",
+          args.unity_weights
+        );
+
         return prisma.foods.create({
           data: {
             food: args.food,
