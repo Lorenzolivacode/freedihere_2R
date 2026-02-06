@@ -6,6 +6,20 @@ freedihare-2R-first-app/
 ├─ **app/** ← frontend - React SPA (Vite)
 │ ├─ src/
 │ │ ├─ components/
+│ │ │ ├─ atoms
+│ │ │ ├─ molecules
+│ │ │ └─ organisms
+│ │ │
+│ │ ├─ gql_crud/
+│ │ │ ├─ ...models/
+│ │ │ │ ├─ queries.ts
+│ │ │ │ └─ mutations.ts
+│ │ │ └─ .
+│ │ │
+│ │ ├─ utils/
+│ │ │
+│ │ ├─ types/
+│ │ │
 │ │ ├─ App.tsx
 │ │ └─ main.tsx
 │ ├─ dist/

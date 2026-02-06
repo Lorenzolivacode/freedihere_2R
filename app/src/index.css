@@ -15,6 +15,34 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --color-white: #fefcf2;
+  --color-black: #070101;
+
+  --color-background: #f3f9fd;
+  --color-foreground: #071013;
+
+  --color-logo-blue: #1b5974;
+  --color-logo-green: #c1f8a0;
+
+  --color-primary: #53b6d6;
+  --color-secondary: #fedc4f;
+
+  --color-fat: #8ec8f2;
+  --color-sat_fat: #c4d9e9;
+  --color-carbo: #fbcd6a;
+  --color-sugar: #ffe2a2;
+  --color-fiber: #dbc89c;
+  --color-prot: #d47461;
+  --color-salt: #b6e3e1;
+  --color-kcal: #afd482;
+}
+.darkmode {
+  --color-background: #071013;
+  --color-foreground: #f3f9fd;
+
+  --color-primary: #70d7f9;
+  --color-secondary: #ffe375;
 }
 
 a {
