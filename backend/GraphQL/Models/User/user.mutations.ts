@@ -26,9 +26,10 @@ Builder.mutationField("createUser", (t) =>
           sex: args.sex,
           birthday: args.birthday,
           height: args.height,
+          role: "USER",
         },
         ...(query as any),
       });
     },
-  })
+  }),
 );

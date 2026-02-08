@@ -87,3 +87,17 @@ Prisma
 │
 ▼
 Supabase (Postgres)
+
+## Flusso user-session
+
+- **Frontend** -> sceglie
+- **Backend** -> riceve
+- **GraphQL** -> lo mette nel context
+- **Prisma** -> lo usa
+
+| Layer               | Cosa fa               |
+| ------------------- | --------------------- |
+| **Frontend**        | salva userId attivo   |
+| **Request GraphQL** | lo manda negli header |
+| **Backend Context** | lo legge              |
+| **Resolver**        | lo usa                |
