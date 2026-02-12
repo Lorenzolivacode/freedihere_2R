@@ -9,20 +9,9 @@ export const Foods = Builder.prismaObject("Foods", {
       description: "Note opzionali relative al cibo", // Opzionale
     }),
 
-    createdAt: t.field({
-      type: "String",
-      resolve: (parent) => parent.createdAt.toISOString(),
-    }),
-    updatedAt: t.field({
-      type: "String",
-      resolve: (parent) =>
-        parent.updatedAt ? parent.updatedAt.toISOString() : null,
-    }),
-    deletedAt: t.field({
-      type: "String",
-      resolve: (parent) =>
-        parent.deletedAt ? parent.deletedAt.toISOString() : null,
-    }),
+    createdAt: t.expose("createdAt", { type: "DateTime" }),
+    updatedAt: t.expose("updatedAt", { type: "DateTime", nullable: true }),
+    deletedAt: t.expose("deletedAt", { type: "DateTime", nullable: true }),
 
     subcategory: t.relation("subcat", { nullable: true }),
     dets: t.relation("dets"),

@@ -14,10 +14,8 @@ export const Details = Builder.prismaObject("Details", {
     deletedAt: t.expose("deletedAt", { type: "DateTime", nullable: true }),
 
     // relations
-    id_food: t.exposeString("id_food"),
     food: t.relation("food", { nullable: false }),
     macro: t.relation("macro", { nullable: true }),
-    id_brand: t.exposeString("id_brand"),
     brand: t.relation("brand", { nullable: true }),
     specifics: t.relation("specifics"),
     user: t.relation("user", { nullable: true }),
@@ -31,25 +29,12 @@ export const join_detail_shop = Builder.prismaObject("join_detail_shop", {
   fields: (t) => ({
     id: t.exposeString("id"),
 
-    createdAt: t.field({
-      type: "String",
-      resolve: (parent) => parent.createdAt.toISOString(),
-    }),
-    updatedAt: t.field({
-      type: "String",
-      resolve: (parent) =>
-        parent.updatedAt ? parent.updatedAt.toISOString() : null,
-    }),
-    deletedAt: t.field({
-      type: "String",
-      resolve: (parent) =>
-        parent.deletedAt ? parent.deletedAt.toISOString() : null,
-    }),
+    createdAt: t.expose("createdAt", { type: "DateTime" }),
+    updatedAt: t.expose("updatedAt", { type: "DateTime", nullable: true }),
+    deletedAt: t.expose("deletedAt", { type: "DateTime", nullable: true }),
 
     // relations
-    id_detail: t.exposeString("id_detail"),
     detail: t.relation("detail"),
-    id_shop: t.exposeString("id_shop"),
     shop: t.relation("shop"),
   }),
 });

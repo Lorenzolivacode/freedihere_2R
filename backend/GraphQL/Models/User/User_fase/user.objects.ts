@@ -12,7 +12,6 @@ export const FaseUser = Builder.prismaObject("FaseUser", {
     deletedAt: t.expose("deletedAt", { type: "DateTime", nullable: true }),
 
     // relations
-    id_user: t.exposeString("id_user"),
     user: t.relation("user"),
     fase_specifics: t.relation("fase_specifics"),
   }),
@@ -37,7 +36,6 @@ export const Fase_specifics = Builder.prismaObject("Fase_specifics", {
     updatedAt: t.expose("updatedAt", { type: "DateTime", nullable: true }),
 
     // relations
-    id_fase: t.exposeString("id_fase"),
     fase: t.relation("fase"),
     diaryUser: t.relation("diaryUser"),
   }),
@@ -55,7 +53,6 @@ export const DiaryUser = Builder.prismaObject("DiaryUser", {
     updatedAt: t.expose("updatedAt", { type: "DateTime", nullable: true }),
 
     // relations
-    id_fase_specific: t.exposeString("id_fase_specific"),
     fase_specific: t.relation("fase_specific"),
     meals: t.relation("meals"),
   }),

@@ -35,9 +35,7 @@ export const join_recipe_recipe = Builder.prismaObject("join_recipe_recipe", {
     deletedAt: t.expose("deletedAt", { type: "DateTime", nullable: true }),
 
     // relations
-    id_recipePrinc: t.exposeString("id_recipePrinc"),
     recipe_princ: t.relation("recipe_princ"),
-    id_recipeIngr: t.exposeString("id_recipeIngr"),
     recipe_ingr: t.relation("recipe_ingr"),
   }),
 });

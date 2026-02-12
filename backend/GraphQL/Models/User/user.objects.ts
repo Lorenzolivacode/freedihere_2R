@@ -63,12 +63,12 @@ export const DataUser = Builder.prismaObject("DataUser", {
       type: "Decimal",
       nullable: true,
     }),
+    day: t.expose("day", { type: "DateTime" }),
 
     createdAt: t.expose("createdAt", { type: "DateTime" }),
     updatedAt: t.expose("updatedAt", { type: "DateTime", nullable: true }),
 
     // relations
-    id_user: t.exposeString("id_user"),
     user: t.relation("user"),
   }),
 });

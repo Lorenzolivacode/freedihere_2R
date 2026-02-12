@@ -10,7 +10,7 @@ export const Pans = Builder.prismaObject("Pans", {
 
     createdAt: t.expose("createdAt", { type: "DateTime" }),
 
-    id_user: t.exposeString("id_user"),
+    //Relazioni
     user: t.relation("user"),
   }),
 });

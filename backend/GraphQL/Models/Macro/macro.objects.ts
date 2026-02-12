@@ -44,9 +44,7 @@ export const Macro = Builder.prismaObject("Macro", {
     createdAt: t.expose("createdAt", { type: "DateTime" }),
 
     // relations
-    id_detail: t.exposeString("id_detail"),
-    detail: t.relation("detail"),
-    id_recipe: t.exposeString("id_recipe"),
-    recipe: t.relation("recipe"),
+    detail: t.relation("detail", { nullable: true }),
+    recipe: t.relation("recipe", { nullable: true }),
   }),
 });

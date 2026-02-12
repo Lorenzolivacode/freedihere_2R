@@ -5,20 +5,9 @@ export const Category = Builder.prismaObject("Category", {
     id: t.exposeString("id"),
     category_name: t.exposeString("category_name"),
 
-    createdAt: t.field({
-      type: "String",
-      resolve: (parent) => parent.createdAt.toISOString(),
-    }),
-    updatedAt: t.field({
-      type: "String",
-      resolve: (parent) =>
-        parent.updatedAt ? parent.updatedAt.toISOString() : null,
-    }),
-    deletedAt: t.field({
-      type: "String",
-      resolve: (parent) =>
-        parent.deletedAt ? parent.deletedAt.toISOString() : null,
-    }),
+    createdAt: t.expose("createdAt", { type: "DateTime" }),
+    updatedAt: t.expose("updatedAt", { type: "DateTime", nullable: true }),
+    deletedAt: t.expose("deletedAt", { type: "DateTime", nullable: true }),
 
     subcategory: t.relation("subcat"),
   }),

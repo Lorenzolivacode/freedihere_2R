@@ -80,6 +80,7 @@ model DataUser {
   calf              Decimal? @db.Decimal(10, 2) @default(0.0)  //Polpaccio
   fat_mass          Decimal? @db.Decimal(10, 2) @default(0.0)  //Massa grassa
   BMI               Decimal? @db.Decimal(10, 2) @default(0.0)  //Body mass index
+  day               DateTime @default(now())
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime? 
