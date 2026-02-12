@@ -28,11 +28,12 @@ Builder.mutationField("createFood", (t) =>
       // specifics
       unity_weights: t.arg({ type: ["Decimal"], required: false }),
     },
-    resolve: async (query, _parent, args) => {
+    resolve: async (query, _parent, args, context) => {
       const dets = {
         detail_product: args.detail_product,
         note: args.note,
         id_brand: args.id_brand || null,
+        id_user: context.userId,
         macro: {
           create: {
             kcal: args.kcal,
@@ -74,9 +75,9 @@ Builder.mutationField("createFood", (t) =>
         },
       });
 
-      if (existingFood) {
-        console.log("siamo qui in createFood existingFood");
+      let resFood;
 
+      if (existingFood) {
         await prisma.details.create({
           data: {
             id_food: existingFood.id,
@@ -85,7 +86,7 @@ Builder.mutationField("createFood", (t) =>
         });
 
         // restituisci l'oggetto food esistente, non il detail
-        return existingFood;
+        resFood = existingFood;
       } else {
         console.log(
           "siamo qui in createFood",
@@ -122,10 +123,10 @@ Builder.mutationField("createFood", (t) =>
           "\n salt: ",
           args.salt,
           "\n unity_weights: ",
-          args.unity_weights
+          args.unity_weights,
         );
 
-        return prisma.foods.create({
+        resFood = prisma.foods.create({
           data: {
             food: args.food,
             food_note: args.food_note,
@@ -137,6 +138,38 @@ Builder.mutationField("createFood", (t) =>
           ...(query as any),
         });
       }
+
+      if (args.id_brand && args.join_shops?.length) {
+        let joinShopBrands: {
+          existing: any[];
+          notExisting: string[];
+        } = { existing: [], notExisting: [] };
+
+        for (const curr of args.join_shops) {
+          const findJoin = await prisma.join_shop_brand.findUnique({
+            where: {
+              id_brand_id_shop: {
+                id_brand: args.id_brand,
+                id_shop: curr,
+              },
+            },
+          });
+
+          if (findJoin) joinShopBrands.existing.push(findJoin);
+          else joinShopBrands.notExisting.push(curr);
+        }
+
+        if (joinShopBrands.notExisting.length > 0) {
+          await prisma.join_shop_brand.createMany({
+            data: joinShopBrands.notExisting.map((s) => ({
+              id_shop: s,
+              id_brand: args.id_brand!,
+            })),
+          });
+        }
+      }
+
+      return resFood;
     },
-  })
+  }),
 );

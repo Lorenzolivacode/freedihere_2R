@@ -1,6 +1,3 @@
 export * from "./user.objects.js";
 export * from "./user.mutations.js";
 export * from "./user.queries.js";
-
-export * from "./User_fase/index.js";
-export * from "./User_meal/index.js";

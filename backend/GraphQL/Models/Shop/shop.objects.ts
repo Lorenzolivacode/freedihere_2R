@@ -20,9 +20,7 @@ export const join_shop_brand = Builder.prismaObject("join_shop_brand", {
     createdAt: t.expose("createdAt", { type: "DateTime" }),
 
     // relations
-    id_brand: t.exposeString("id_brand"),
     brand: t.relation("brand"),
-    id_shop: t.exposeString("id_shop"),
     shop: t.relation("shop"),
   }),
 });

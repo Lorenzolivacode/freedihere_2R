@@ -17,16 +17,24 @@ const server = new ApolloServer({
   schema,
   plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
 });
-console.log("SERVER: ", server);
+//console.log("SERVER: ", server);
 
 const start = async () => {
   // Apollo 5 standalone gestisce i CORS automaticamente per localhost
   const { url } = await startStandaloneServer(server, {
     listen: { port: Number(process.env.PORT) || 4000 },
-    context: async ({ req }) => ({
+    /* context: async ({ req }) => ({
       prisma,
       userId: req.headers.authorization || null,
-    }),
+    }), */
+    context: async ({ req }) => {
+      const userId = req.headers["x-user-id"] || null;
+
+      return {
+        prisma,
+        userId,
+      };
+    },
   });
 
   console.log(`🚀 Server pronto su: ${url}`);

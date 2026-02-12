@@ -360,6 +360,9 @@ model join_shop_brand {
   brand             Brand @relation(fields:[id_brand], references:[id], onDelete: Cascade)
   id_shop           String
   shop              Shop @relation(fields:[id_shop], references:[id], onDelete: Cascade)
+
+  @@unique([id_brand, id_shop])
+  @@index([id_brand, id_shop])
 }
 
 model join_detail_shop {

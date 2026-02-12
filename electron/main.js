@@ -6,9 +6,12 @@ const path = require("path");
 const isDev = !app.isPackaged;
 
 function createWindow() {
+  console.log("ICON", path.join(__dirname, "assets", 'freedihare_logo.ico'));
+
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
+    icon: path.join(__dirname, "assets", 'freedihare_logo.ico'),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"), // Carica il bridge
       contextIsolation: true, // Sicurezza attiva

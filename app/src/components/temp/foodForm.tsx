@@ -4,8 +4,40 @@ import { GET_BRANDS, GET_SHOPS } from "../../gql_crud/brands_shop/queries.js";
 import { GET_SUBCATEGORIES } from "../../gql_crud/cats_subs/queries.js";
 import { CREATE_FOOD_DETS } from "../../gql_crud/foods_dets/mutations.js";
 import { GET_FOODS_BY_INPUT } from "../../gql_crud/foods_dets/queries.js";
+import { getActiveUser, setActiveUser } from "../../utils/session.js";
+import { GET_USERDATA_BASE } from "../../gql_crud/user/queries.js";
+
+interface IUserBase {
+  name: string;
+  surname: string;
+  nickname: string;
+  role: string;
+  birthday: Date;
+  email: string;
+  height: string;
+  sex: string;
+}
 
 export default function CreateFoodForm() {
+  let userId = getActiveUser();
+  if (!userId) {
+    userId = "lorenzoliva_admin";
+    setActiveUser(userId);
+  }
+
+  const {
+    loading: userLoading,
+    error: userError,
+    data: userData,
+  } = useQuery<{ user: IUserBase }>(GET_USERDATA_BASE, {
+    variables: { userId },
+  });
+  useEffect(() => {
+    console.log("USER DATA: ", userData);
+    if (userError) console.log("USER: ", userId, "\nUSER Error: ", userError);
+    if (userLoading) console.log("USER Loading: ", userLoading);
+  }, [userData, userLoading, userError]);
+
   const [createFood, { loading, error }] = useMutation(CREATE_FOOD_DETS);
 
   const {
@@ -149,7 +181,7 @@ export default function CreateFoodForm() {
           food: string;
           food_note: string;
           subcategory: { id: string; subcategory_name: string };
-        }) => f.id === selectedFood
+        }) => f.id === selectedFood,
       );
 
       if (food) {
@@ -190,6 +222,15 @@ export default function CreateFoodForm() {
 
   return (
     <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+      {!userLoading && !userError && (
+        <div className="w-full flex justify-between">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            {" "}
+            Ciao {userData?.user?.name}
+          </h2>
+          <p>{userData?.user.email}</p>
+        </div>
+      )}
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Create Food</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -229,7 +270,7 @@ export default function CreateFoodForm() {
                 <option key={subcategory.id} value={subcategory.id}>
                   {subcategory.food}
                 </option>
-              )
+              ),
             )}
           </select>
 
@@ -275,7 +316,7 @@ export default function CreateFoodForm() {
                   <option key={subcategory.id} value={subcategory.id}>
                     {subcategory.subcategory_name}
                   </option>
-                )
+                ),
               )}
             </select>
           )}

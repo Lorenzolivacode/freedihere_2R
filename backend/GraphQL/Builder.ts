@@ -8,8 +8,10 @@ import { GraphQLError, GraphQLScalarType, Kind } from "graphql";
 //import { Prisma } from "../generated/prisma/client.js";
 //import * as GeneratedClient from "../generated/prisma/client.js";
 import { DateTimeResolver, JSONResolver } from "graphql-scalars";
+import { PrismaClient } from "generated/prisma/index.js";
 
 export interface GraphQLContext {
+  prisma: PrismaClient;
   userId: string | null;
   req: Request;
 }
@@ -58,7 +60,7 @@ Builder.scalarType("Decimal", {
     }
     // Invece di return null, lancia un GraphQLError
     throw new GraphQLError(
-      `Decimal Scalar can only parse string, int or float but got ${ast.kind}`
+      `Decimal Scalar can only parse string, int or float but got ${ast.kind}`,
     );
   },
 });
