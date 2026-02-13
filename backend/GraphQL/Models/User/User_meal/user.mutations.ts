@@ -1,31 +1,25 @@
 import { prisma } from "../../../../src/lib/prisma.js";
 import { Builder } from "../../../Builder.js";
-import { SexEnum } from "../../../enum.js";
+import { mealFoodInput } from "../user.inputs.js";
 
-Builder.mutationField("UserMeal", (t) =>
+Builder.mutationField("createUserMeal", (t) =>
   t.prismaField({
-    type: "User",
+    type: "Meals",
     args: {
-      name: t.arg.string({ required: true }),
-      surname: t.arg.string({ required: true }),
-      nickname: t.arg.string({ required: false }),
-      email: t.arg.string({ required: true }),
-      password: t.arg.string({ required: true }),
-      sex: t.arg({ type: SexEnum, required: true }),
-      birthday: t.arg({ type: "DateTime", required: true }),
-      height: t.arg.int({ required: true }),
+      meal_name: t.arg.string({ required: true }),
+      mealSnapshot: t.arg.string({ required: true }),
+      id_diary: t.arg.string({ required: true }),
+      //aggiungere input per alimenti per creare join_meal_food
+      mealFood: t.arg({ type: [mealFoodInput], required: true }),
     },
     resolve: (query, _parent, args) => {
-      return prisma.user.create({
+      return prisma.meals.create({
         data: {
-          name: args.name,
-          surname: args.surname,
-          nickname: args.nickname,
-          email: args.email,
-          password: args.password,
-          sex: args.sex,
-          birthday: args.birthday,
-          height: args.height,
+          meal_name: args.meal_name,
+          mealSnapshot: args.mealSnapshot,
+          id_diary: args.id_diary,
+
+          join_meal_food: args.mealFood,
         },
         ...(query as any),
       });

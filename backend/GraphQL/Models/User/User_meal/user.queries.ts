@@ -12,7 +12,7 @@ Builder.queryField("meals", (t) =>
       const { id_diary } = args;
 
       return prisma.meals.findMany({
-        ...query, // per id_diary && meal_name
+        ...query,
         where: {
           id_diary,
         },
@@ -31,7 +31,7 @@ Builder.queryField("join_meal_food", (t) =>
     },
     resolve: (query, _parent, args) => {
       return prisma.join_meal_food.findUnique({
-        where: { id: args.id }, // per id_meal
+        where: { id: args.id },
         ...query,
       });
     },

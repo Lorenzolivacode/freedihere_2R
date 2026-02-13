@@ -4,14 +4,21 @@ import { prisma } from "../../../../src/lib/prisma.js";
 Builder.queryField("faseUser", (t) =>
   t.prismaField({
     type: ["FaseUser"],
-    resolve: (query) => {
-      return prisma.faseUser.findMany({
-        ...query, // where userId
-      });
+    resolve: (query, _p, _args, context) => {
+      if (context.userId) {
+        return prisma.faseUser.findMany({
+          where: {
+            id_user: context.userId,
+          },
+          ...query,
+        });
+      } else return null;
     },
   }),
 );
 
+/* Fase_specifics e  DiaryUser possono essere prese con riferimento a userId 
+solo tramite FaseUser*/
 Builder.queryField("fase_specifics", (t) =>
   t.prismaField({
     type: "Fase_specifics",
@@ -27,7 +34,8 @@ Builder.queryField("fase_specifics", (t) =>
     },
   }),
 );
-Builder.queryField("DiaryUser", (t) =>
+
+Builder.queryField("diaryUser", (t) =>
   t.prismaField({
     type: "DiaryUser",
     nullable: true,
@@ -36,7 +44,7 @@ Builder.queryField("DiaryUser", (t) =>
     },
     resolve: (query, _parent, args) => {
       return prisma.diaryUser.findUnique({
-        where: { id: args.id }, // findUnique per day - findMany per id_fase_specific
+        where: { id: args.id }, // per id diary
         ...query,
       });
     },
