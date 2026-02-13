@@ -8,3 +8,16 @@ export const GET_SUBCATEGORIES = gql`
     }
   }
 `;
+
+export const GET_CATEGORIES = gql`
+  query GetCategories {
+    getCategories {
+      id
+      category_name
+      subcategory {
+        id
+        subcategory_name
+      }
+    }
+  }
+`;

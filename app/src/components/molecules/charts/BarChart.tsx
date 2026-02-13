@@ -56,9 +56,11 @@ export function BarChart({
     ? transformMultiSeriesData(data as ChartSeries[])
     : (data as ChartDataPoint[])
 
-  const seriesKeys = isMultiSeries
+  // seriesKeys usato per future label e accessibilità
+  const _seriesKeys = isMultiSeries
     ? (data as ChartSeries[]).map((s) => s.id)
     : ['value']
+  void _seriesKeys
 
   const isEmpty = !chartData || chartData.length === 0
 

@@ -7,7 +7,7 @@ import { getActiveUser } from "./utils/session";
 import App from "./App.tsx";
 import "./index.css";
 
-const authLink = new SetContextLink((prevContext, operation) => {
+const authLink = new SetContextLink((prevContext) => {
   const userId = getActiveUser(); // la tua funzione
 
   return {
